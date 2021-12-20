@@ -68,16 +68,16 @@ class Environment(EnvironmentModel):
         
 class FrozenLake(Environment):
     def __init__(self, lake, slip, max_steps, seed=None):
-    """
-    lake: A matrix that represents the lake. For example:
-     lake =  [['&', '.', '.', '.'],
-              ['.', '#', '.', '#'],
-              ['.', '.', '.', '#'],
-              ['#', '.', '.', '$']]
-    slip: The probability that the agent will slip
-    max_steps: The maximum number of time steps in an episode
-    seed: A seed to control the random number generator (optional)
-    """
+        """
+        lake: A matrix that represents the lake. For example:
+         lake =  [['&', '.', '.', '.'],
+                  ['.', '#', '.', '#'],
+                  ['.', '.', '.', '#'],
+                  ['#', '.', '.', '$']]
+        slip: The probability that the agent will slip
+        max_steps: The maximum number of time steps in an episode
+        seed: A seed to control the random number generator (optional)
+        """
         # start (&), frozen (.), hole (#), goal ($)
         self.lake = np.array(lake)
         self.lake_flat = self.lake.reshape(-1)
@@ -93,6 +93,9 @@ class FrozenLake(Environment):
         self.absorbing_state = n_states - 1
         
         # TODO:
+        Environment.__init__(self, n_states, n_actions, max_steps, None)
+        # Load the precomputed transition probabilities
+        self._p = np.load('p.npy')
         
     def step(self, action):
         state, reward, done = Environment.step(self, action)
@@ -103,10 +106,15 @@ class FrozenLake(Environment):
         
     def p(self, next_state, state, action):
         # TODO:
-    
+        return self._p[next_state, state, action]
+
     def r(self, next_state, state, action):
         # TODO:
-   
+        if state < self.n_states - 1 and self.lake_flat[state] == '$':
+            return 1
+        else:
+            return 0
+
     def render(self, policy=None, value=None):
         if policy is None:
             lake = np.array(self.lake_flat)
@@ -118,13 +126,25 @@ class FrozenLake(Environment):
         else:
             # UTF-8 arrows look nicer, but cannot be used in LaTeX
             # https://www.w3schools.com/charsets/ref_utf_arrows.asp
-            actions = ['^', '<', '_', '>']
-            
+            # actions = ['^', '<', '_', '>']
+            actions = ['▲', '◄', '▼', '►']
+
             print('Lake:')
             print(self.lake)
         
             print('Policy:')
             policy = np.array([actions[a] for a in policy[:-1]])
+
+            # We have to do add this to the end so printed policy does not overwrite the holes and goal tile with actions arrows
+            policy = policy.reshape(self.lake.shape)
+            for i in range(len(self.lake[0])):
+                for j in range(len(self.lake[0])):
+                    if self.lake[i][j] == '$':
+                        policy[i][j] = '$'
+                    elif self.lake[i][j] == '#':
+                        policy[i][j] = '#'
+                    else:
+                        pass
             print(policy.reshape(self.lake.shape))
             
             print('Value:')
@@ -150,7 +170,7 @@ def play(env):
 
 ################ Model-based algorithms ################
 
- def policy_evaluation(env, policy, gamma, theta, max_iterations):
+def policy_evaluation(env, policy, gamma, theta, max_iterations):
     value = np.zeros(env.n_states, dtype=np.float)
 
     # TODO:
@@ -314,17 +334,17 @@ def main():
     
     print('')
     
-    print('## Policy iteration')
-    policy, value = policy_iteration(env, gamma, theta, max_iterations)
-    env.render(policy, value)
+    # print('## Policy iteration')
+    # policy, value = policy_iteration(env, gamma, theta, max_iterations)
+    # env.render(policy, value)
     
-    print('')
+    # print('')
     
-    print('## Value iteration')
-    policy, value = value_iteration(env, gamma, theta, max_iterations)
-    env.render(policy, value)
+    # print('## Value iteration')
+    # policy, value = value_iteration(env, gamma, theta, max_iterations)
+    # env.render(policy, value)
     
-    print('')
+    # print('')
     
     print('# Model-free algorithms')
     max_episodes = 2000
@@ -333,32 +353,66 @@ def main():
     
     print('')
     
-    print('## Sarsa')
-    policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed)
-    env.render(policy, value)
+    # print('## Sarsa')
+    # policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed)
+    # env.render(policy, value)
     
-    print('')
+    # print('')
     
-    print('## Q-learning')
-    policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
-    env.render(policy, value)
+    # print('## Q-learning')
+    # policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
+    # env.render(policy, value)
     
-    print('')
+    # print('')
     
-    linear_env = LinearWrapper(env)
+    # linear_env = LinearWrapper(env)
     
-    print('## Linear Sarsa')
+    # print('## Linear Sarsa')
     
-    parameters = linear_sarsa(linear_env, max_episodes, eta,
-                              gamma, epsilon, seed=seed)
-    policy, value = linear_env.decode_policy(parameters)
-    linear_env.render(policy, value)
+    # parameters = linear_sarsa(linear_env, max_episodes, eta,
+    #                           gamma, epsilon, seed=seed)
+    # policy, value = linear_env.decode_policy(parameters)
+    # linear_env.render(policy, value)
     
-    print('')
+    # print('')
     
-    print('## Linear Q-learning')
+    # print('## Linear Q-learning')
     
-    parameters = linear_q_learning(linear_env, max_episodes, eta,
-                                   gamma, epsilon, seed=seed)
-    policy, value = linear_env.decode_policy(parameters)
-    linear_env.render(policy, value)
+    # parameters = linear_q_learning(linear_env, max_episodes, eta,
+    #                                gamma, epsilon, seed=seed)
+    # policy, value = linear_env.decode_policy(parameters)
+    # linear_env.render(policy, value)
+
+
+seed = 0
+# Small lake
+lake =   [['&', '.', '.', '.'],
+          ['.', '#', '.', '#'],
+          ['.', '.', '.', '#'],
+          ['#', '.', '.', '$']]
+
+env = FrozenLake(lake, slip=0.1, max_steps=16, seed=seed)
+done = False 
+while not done:
+    actions = ['w', 'a', 's', 'd']
+
+    state = env.reset()
+    env.render()
+
+    done = False
+    while not done:
+        c = input('\nMove: ')
+        if c not in actions:
+            env.render()
+            raise Exception('Invalid action')
+
+        state, r, done = env.step(actions.index(c))
+        print(done)
+        env.render()
+        print('Reward: {0}.'.format(r))
+
+
+
+
+# if __name__ == "__main__":
+#     main()
