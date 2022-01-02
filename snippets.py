@@ -384,35 +384,35 @@ def main():
     # linear_env.render(policy, value)
 
 
-seed = 0
-# Small lake
-lake =   [['&', '.', '.', '.'],
-          ['.', '#', '.', '#'],
-          ['.', '.', '.', '#'],
-          ['#', '.', '.', '$']]
+# seed = 0
+# # Small lake
+# lake =   [['&', '.', '.', '.'],
+#           ['.', '#', '.', '#'],
+#           ['.', '.', '.', '#'],
+#           ['#', '.', '.', '$']]
 
-env = FrozenLake(lake, slip=0.1, max_steps=16, seed=seed)
-done = False 
-while not done:
-    actions = ['w', 'a', 's', 'd']
+# env = FrozenLake(lake, slip=0.1, max_steps=16, seed=seed)
+# done = False 
+# while not done:
+#     actions = ['w', 'a', 's', 'd']
 
-    state = env.reset()
-    env.render()
+#     state = env.reset()
+#     env.render()
 
-    done = False
-    while not done:
-        c = input('\nMove: ')
-        if c not in actions:
-            env.render()
-            raise Exception('Invalid action')
+#     done = False
+#     while not done:
+#         c = input('\nMove: ')
+#         if c not in actions:
+#             env.render()
+#             raise Exception('Invalid action')
 
-        state, r, done = env.step(actions.index(c))
-        print(done)
-        env.render()
-        print('Reward: {0}.'.format(r))
-
-
+#         state, r, done = env.step(actions.index(c))
+#         print(done)
+#         env.render()
+#         print('Reward: {0}.'.format(r))
 
 
-# if __name__ == "__main__":
-#     main()
+
+
+if __name__ == "__main__":
+    main()
