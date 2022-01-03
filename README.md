@@ -2,6 +2,6 @@
 
 How to run the file:
 
-`python snippets.py`
+`python main.py`
 
 everything is being called from the main function
