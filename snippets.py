@@ -315,6 +315,18 @@ def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
         s = env.reset()
         # TODO:
         
+        done = False
+        while done != True:
+            if np.random.random() <= epsilon[i]:
+                a = np.random.randint(0, env.n_actions)
+            else:
+                a = np.argmax(q[s,:])
+
+            n_s, reward, done = env.step(a)
+
+            q[s, a] = q[s, a] + (eta[i] * (reward + (gamma * q[n_s,:].max()) - q[s, a]))
+            s = n_s
+
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
@@ -439,11 +451,11 @@ def main():
     
     print('')
     
-    # print('## Q-learning')
-    # policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
-    # env.render(policy, value)
+    print('## Q-learning')
+    policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
+    env.render(policy, value)
     
-    # print('')
+    print('')
     
     # linear_env = LinearWrapper(env)
     
