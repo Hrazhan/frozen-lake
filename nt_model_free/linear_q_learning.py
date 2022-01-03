@@ -21,8 +21,8 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
                 a = np.argmax(q)
             else:
                 a = np.random.choice(env.n_actions)
-            nxt_feat, r, terminal = env.step(a)
-            delta_val = r - q[a]
+            nxt_feat, reward, terminal = env.step(a)
+            delta_val = reward - q[a]
             q = nxt_feat.dot(theta)
             delta_val += gamma*max(q)
             theta += eta[i]*delta_val*features[a]

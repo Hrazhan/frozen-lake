@@ -21,8 +21,8 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
         else:
             a = np.random.choice(env.n_actions)
         while not is_terminal:
-            nxt_feat, r, is_terminal = env.step(a)
-            delta_val = r - q[a]
+            nxt_feat, reward, is_terminal = env.step(a)
+            delta_val = reward - q[a]
             q = nxt_feat.dot(theta)
             if np.random.rand() < (1 - epsilon[i]) and max(q) != 0:
                 nxt_act = np.argmax(q)

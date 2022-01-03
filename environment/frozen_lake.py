@@ -31,6 +31,9 @@ class FrozenLake(Environment):
         
         # TODO:
         Environment.__init__(self, n_states, n_actions, max_steps, None)
+
+        # Up 0, down 1, left 2, right 3
+        self.actions = [(-1, 0), (0, -1), (1, 0), (0, 1)]
         # Load the precomputed transition probabilities
         self._p = np.load('./p.npy')
         
