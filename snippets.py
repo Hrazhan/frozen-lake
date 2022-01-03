@@ -279,6 +279,25 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
         s = env.reset()
         # TODO:
     
+        # select an action based on E-greedy 
+        if np.random.random() <= epsilon[i]:
+            a = np.random.randint(0, env.n_actions)
+        else:
+            a = np.argmax(q[s,:])
+
+        done = False
+        while done != True:
+            n_s, reward, done = env.step(a)
+
+            # Select new action using e greedy for next state
+            if np.random.random() <= epsilon[i]:
+                next_action = np.random.randint(0, env.n_actions)
+            else:
+                next_action = np.argmax(q[n_s,:])
+
+            q[s, a] = q[s, a] + (eta[i] * (reward + (gamma * q[n_s, next_action]) - q[s, a]))
+            s = n_s
+            a = next_action
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
@@ -414,11 +433,11 @@ def main():
     
     print('')
     
-    # print('## Sarsa')
-    # policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed)
-    # env.render(policy, value)
+    print('## Sarsa')
+    policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed)
+    env.render(policy, value)
     
-    # print('')
+    print('')
     
     # print('## Q-learning')
     # policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
