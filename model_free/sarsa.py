@@ -19,7 +19,7 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
             a = np.argmax(q[s,:])
 
         done = False
-        while done != True:
+        while not done:
             n_s, reward, done = env.step(a)
 
             # Select new action using e greedy for next state
@@ -31,6 +31,7 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
             q[s, a] = q[s, a] + (eta[i] * (reward + (gamma * q[n_s, next_action]) - q[s, a]))
             s = n_s
             a = next_action
+
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
