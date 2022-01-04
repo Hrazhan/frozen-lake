@@ -15,13 +15,13 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
 
         # TODO:
         q = features.dot(theta)
-        terminal = False
-        while not terminal:
+        done = False
+        while not done:
             if np.random.rand() < 1 - epsilon[i] and max(q) != 0:
                 a = np.argmax(q)
             else:
                 a = np.random.choice(env.n_actions)
-            nxt_feat, reward, terminal = env.step(a)
+            nxt_feat, reward, done = env.step(a)
             delta_val = reward - q[a]
             q = nxt_feat.dot(theta)
             delta_val += gamma*max(q)
