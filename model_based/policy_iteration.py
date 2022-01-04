@@ -14,9 +14,8 @@ def policy_evaluation(env, policy, gamma, theta, max_iterations):
             for n_s in range(env.n_states):
                 v_s += env.p(n_s, s, policy[s]) * (env.r(n_s, s, policy[s]) + gamma * value[n_s])
             value[s] = v_s
-            delta = max(delta, abs(Vold - value[s]))
+            delta = np.maximum(delta, abs(Vold - value[s]))
         i += 1
-    # print("Num of iterations", i)
     return value
     
 def policy_improvement(env, value, gamma):
@@ -51,10 +50,11 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
         policy = policy_improvement(env, value, gamma)
 
         # break when it converges
-        if (prev_policy == policy).all():
+        # if (prev_policy == policy).all():
+        if np.array_equal(prev_policy, policy):
             counter = i + 1
             break
         
         prev_policy = policy
     # print("Num of iterations", counter)
-    return policy, value
+    return policy, value 

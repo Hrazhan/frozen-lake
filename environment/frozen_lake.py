@@ -48,7 +48,7 @@ class FrozenLake(Environment):
         
 
         # Precomputed transition probabilities
-        self.tansition_probs = np.zeros((self.n_states, self.n_states, self.n_actions))
+        self.transition_probs = np.zeros((self.n_states, self.n_states, self.n_actions))
         
         for state_idx, state in enumerate(self.idx_to_states):
             for action_idx, action in enumerate(self.actions):
@@ -68,16 +68,16 @@ class FrozenLake(Environment):
                 # and the agent slips (moves one tile in a random direction)
                 for a_idx, a in enumerate(self.actions):
                     if a == action:
-                        self.tansition_probs[next_state_idx, state_idx, a_idx] += 0.9 # There is 0.9 probability you move to a different tile
-                    self.tansition_probs[next_state_idx, state_idx, a_idx] += self.slip / (self.n_actions)
+                        self.transition_probs[next_state_idx, state_idx, a_idx] += 0.9 # There is 0.9 probability you move to a different tile
+                    self.transition_probs[next_state_idx, state_idx, a_idx] += self.slip / (self.n_actions)
                     # print("Slip chance", self.slip / (self.n_actions))
 
         # Transition probabilities for the absorbing state
         for a_idx, a in enumerate(self.actions):
-            self.tansition_probs[self.absorbing_state, self.absorbing_state, a_idx] += 1
+            self.transition_probs[self.absorbing_state, self.absorbing_state, a_idx] += 1
 
         # Load the precomputed transition probabilities
-        # self.tansition_probs = np.load('./p.npy')
+        # self.transition_probs = np.load('./p.npy')
         
     def step(self, action):
         state, reward, done = Environment.step(self, action)
@@ -88,7 +88,7 @@ class FrozenLake(Environment):
         
     def p(self, next_state, state, action):
         # TODO:
-        return self.tansition_probs[next_state, state, action]
+        return self.transition_probs[next_state, state, action]
 
     def r(self, next_state, state, action):
         # TODO:

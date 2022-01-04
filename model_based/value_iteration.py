@@ -39,5 +39,8 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
                 v_s += env.p(n_s, s, a) * (env.r(n_s, s, a) + gamma * value[n_s])
             q_table[s,a] = v_s
 
-    policy = q_table.argmax(axis = 1)
+    policy = np.argmax(q_table, axis=1)
+
     return policy, value 
+
+
