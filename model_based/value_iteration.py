@@ -9,8 +9,8 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
     # TODO:
     policy = np.zeros(env.n_states, dtype=int)
 
-    i = 0
-    while i < max_iterations:
+    counter = 0
+    for i in range(max_iterations):
         delta = 0
 
         for s in range(env.n_states):
@@ -24,12 +24,12 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
 
             delta = np.maximum(delta, abs(Vold - value[s]))
 
-        i += 1
         # the tolerance parameter determining the accuracy of the estimation
         if delta < theta:
+            counter = i + 1
             break
 
-    # print("Num of iterations", i)
+    # print("Num of iterations", counter)
     
     q_table = np.zeros((env.n_states, env.n_actions))
     for s in range(env.n_states):
@@ -40,4 +40,4 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
             q_table[s,a] = v_s
 
     policy = q_table.argmax(axis = 1)
-    return policy, value
+    return policy, value 

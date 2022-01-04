@@ -45,9 +45,16 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
     value = np.zeros(env.n_states, dtype=float)
     prev_policy = None
 
-    while not (prev_policy == policy).all():
-        prev_policy = policy
+    counter = 0
+    for i in range(max_iterations):
         value = policy_evaluation(env, policy, gamma, theta, max_iterations)
         policy = policy_improvement(env, value, gamma)
+
+        # break when it converges
+        if (prev_policy == policy).all():
+            counter = i + 1
+            break
         
+        prev_policy = policy
+    # print("Num of iterations", counter)
     return policy, value
