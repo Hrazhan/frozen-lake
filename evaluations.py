@@ -40,7 +40,6 @@ def policy_value_iteration(env, gamma, theta, max_iterations):
 
 
 def sarsa_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed=None):
-    print("## Sarsa Evaluation")
     random_state = np.random.RandomState(seed)
     
     eta = np.linspace(eta, 0, max_episodes)
@@ -49,6 +48,7 @@ def sarsa_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, the
     q = np.zeros((env.n_states, env.n_actions))
     
     eps_count = 0
+    counter = 0
     for i in range(max_episodes):
         s = env.reset()
         # TODO:
@@ -75,18 +75,24 @@ def sarsa_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, the
             
         if np.all(np.abs(optimal_policy - q.max(axis=1)) < theta):
             print("No of episodes:", i + 1)
+            counter = i + 1
             break
-    # value_temp = policy_evaluation(env, q.argmax(axis=1) ,gamma, 0.001, 100)
-    # print(value_temp)
+        # value_temp = policy_evaluation(env, q.argmax(axis=1) ,gamma, 0.001, 100)
+        # error = np.mean(np.not_equal(value_temp, optimal_policy))
+        # if error <= theta:
+        #     print("No of episodes:", i + 1)
+        #     counter = i + 1
+        #     break
+
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
-    return policy, value
+    return policy, value, counter
 
 
 
 def q_learning_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed=None):
-    print("## Q-Learning Evaluation")
+    # print("## Q-Learning Evaluation")
     random_state = np.random.RandomState(seed)
     
     eta = np.linspace(eta, 0, max_episodes)
@@ -94,6 +100,7 @@ def q_learning_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy
     
     q = np.zeros((env.n_states, env.n_actions))
     
+    counter = 0
     for i in range(max_episodes):
         s = env.reset()
         # TODO:
@@ -112,12 +119,21 @@ def q_learning_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy
         
         if np.all(np.abs(optimal_policy - q.max(axis=1)) < theta):
             print("No of episodes:", i + 1)
+            counter = i + 1
             break
+        # value_temp = policy_evaluation(env, q.argmax(axis=1) ,gamma, 0.001, 100)
+        # error = np.mean(np.not_equal(value_temp, optimal_policy))
+        # if error <= theta:
+        #     print("No of episodes:", i + 1)
+        #     counter = i + 1
+        #     break
 
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
-    return policy, value
+    return policy, value, counter
+
+
 def main():
     seed = 0
 
@@ -146,14 +162,37 @@ def main():
     # policy_value_iteration(env, gamma, theta, max_iterations)
 
 
-    max_episodes = 15000
-    eta = 0.5
-    epsilon = 0.5
+    max_episodes = 100000
+    eta = 0.2
+    epsilon = 0.1
     _, optimal_policy = policy_iteration(env, 0.9, 0.001, 100)
     theta = 0.1
 
-    sarsa_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
-    q_learning_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
+
+    # print(optimal_policy)
+    # policy, value, _ = sarsa_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
+    # env.render(policy, value)
+    # q_learning_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
+    simulate_sarsa(100, env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
+    simulate_qlearning(100, env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
+
+def simulate_sarsa(n, env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed):
+    print("## Sarsa Evaluation")
+    episodes = []
+    for i in range(n):
+        _, _, eps = sarsa_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
+        episodes.append(eps)
+    
+    print("Mean # of episodes:", round(np.mean(episodes), 4), "episodes")
+
+def simulate_qlearning(n, env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed):
+    print("## Q Learning Evaluation")
+    episodes = []
+    for i in range(n):
+        _, _, eps = q_learning_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
+        episodes.append(eps)
+    
+    print("Mean # of episodes:", round(np.mean(episodes), 4), "episodes")
 
 if __name__ == "__main__":
     main()
