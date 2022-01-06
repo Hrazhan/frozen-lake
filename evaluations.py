@@ -47,7 +47,6 @@ def sarsa_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, the
     
     q = np.zeros((env.n_states, env.n_actions))
     
-    eps_count = 0
     counter = 0
     for i in range(max_episodes):
         s = env.reset()
@@ -153,7 +152,7 @@ def main():
                   ['.', '#', '.', '.', '#', '.', '#', '.'],
                   ['.', '.', '.', '#', '.', '.', '.', '$']]
 
-    lake = np.array(lake)
+    lake = np.array(big_lake)
     env = FrozenLake(lake, slip=0.1, max_steps=lake.size, seed=seed)
 
     gamma = 0.9
@@ -162,7 +161,7 @@ def main():
     # policy_value_iteration(env, gamma, theta, max_iterations)
 
 
-    max_episodes = 100000
+    max_episodes = 50000
     eta = 0.2
     epsilon = 0.1
     _, optimal_policy = policy_iteration(env, 0.9, 0.001, 100)
@@ -170,11 +169,11 @@ def main():
 
 
     # print(optimal_policy)
-    # policy, value, _ = sarsa_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
-    # env.render(policy, value)
+    policy, value, _ = sarsa_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
+    env.render(policy, value)
     # q_learning_evaluation(env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
-    simulate_sarsa(100, env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
-    simulate_qlearning(100, env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
+    # simulate_sarsa(100, env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
+    # simulate_qlearning(100, env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed)
 
 def simulate_sarsa(n, env, max_episodes, eta, gamma, epsilon, optimal_policy, theta, seed):
     print("## Sarsa Evaluation")

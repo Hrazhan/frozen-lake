@@ -16,18 +16,18 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
 
         # TODO:
         done = False
-        if np.random.rand() < (1 - epsilon[i]) and max(q) != 0:
-            a = np.argmax(q)
+        if np.random.random() <= epsilon[i]:
+            a = np.random.randint(0, env.n_actions)
         else:
-            a = np.random.choice(env.n_actions)
+            a = np.argmax(q)
         while not done:
             nxt_feat, reward, done = env.step(a)
             delta_val = reward - q[a]
             q = nxt_feat.dot(theta)
-            if np.random.rand() < (1 - epsilon[i]) and max(q) != 0:
-                nxt_act = np.argmax(q)
+            if np.random.random() <= epsilon[i]:
+                nxt_act = np.random.randint(0, env.n_actions)
             else:
-                nxt_act = np.random.choice(env.n_actions)
+                nxt_act = np.argmax(q)
             delta_val += gamma * q[nxt_act]
             theta += eta[i] * delta_val * features[a]
             features = nxt_feat
